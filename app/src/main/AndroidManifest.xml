@@ -22,8 +22,6 @@
             </intent-filter>
         </activity>
 
-        <meta-data android:name="providential.clientID"
-            android:value="15pmghs05glcnhjhs8g6oprqu90" />
     </application>
 
 </manifest>
