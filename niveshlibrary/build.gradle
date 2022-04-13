@@ -80,7 +80,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.Abhi15m'
                 artifactId = 'nivesh_lib'
-                version = '1.0'
+                version = '1.2'
             }
         }
     }
