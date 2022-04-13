@@ -1,5 +1,6 @@
 package com.providential.niveshlibrary.ui
 
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -8,24 +9,18 @@ import com.providential.niveshlibrary.NiveshApplication
 import com.providential.niveshlibrary.R
 import com.providential.niveshlibrary.di.NetworkModule
 import com.providential.niveshlibrary.util.Utils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
 
-class NiveshActivity : AppCompatActivity(), CoroutineScope by MainScope() {
+class NiveshActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_nivesh)
 
-        getToken()
-//        val ai = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
-//        val bundel = ai.metaData
 
         applicationContext.packageManager.getApplicationInfo(applicationContext.packageName,PackageManager.GET_META_DATA).apply {
             val value = metaData.getString("providential.clientID")!!
@@ -33,23 +28,10 @@ class NiveshActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         }
     }
 
-    fun getToken() : String{
+    @OptIn(DelicateCoroutinesApi::class)
+    fun getToken(){
         var response: String = ""
         var value =""
-//        val pm: PackageManager = this.packageManager
-//        try {
-//            val ai = pm.getApplicationInfo(this.packageName, PackageManager.GET_META_DATA)
-//            value = ai.metaData.getString("providential.clientID")!!
-//        } catch (e: java.lang.Exception) {
-//            Log.d("sugar", "Couldn't find config value: providential.clientID")
-//        }
-
-
-
-//        applicationContext.packageManager.getApplicationInfo(applicationContext.packageName,PackageManager.GET_META_DATA).apply {
-//            value = metaData.getString("providential.clientID")!!
-//        }
-
 
         val jsonObject = JSONObject()
         val jsonObjectData = JSONObject()
@@ -67,7 +49,7 @@ class NiveshActivity : AppCompatActivity(), CoroutineScope by MainScope() {
 
         jsonObject.put("userRefNo", "100")
         jsonObject.put("workFlowID", "10")
-//        jsonObject.put("clientID", "15pmghs05glcnhjhs8g6oprqu90")
+        jsonObject.put("clientID", "15pmghs05glcnhjhs8g6oprqu9")
         jsonObject.put("clientID", value)
         jsonObject.put("clientData", jsonObjectData)
         jsonObject.put("partnerData", jsonObjectPartnerData)
@@ -76,21 +58,20 @@ class NiveshActivity : AppCompatActivity(), CoroutineScope by MainScope() {
         Utils.showLog("GetQuestion", "-->$jsonObject")
         val body = jsonObject.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
 
-        launch(Dispatchers.IO) {
-            NetworkModule.provideRetrofit().getTokenAsync(body).onSuccess { response1 ->
-                try {
-                    response = response1.string()
-                }catch (e:Exception){
-                    e.printStackTrace()
-                }
+            GlobalScope.launch(Dispatchers.Main) {
+                NetworkModule.provideRetrofit().getTokenAsync(body)
+                    .onSuccess { response1 ->
+                        try {
+                            response = response1.string()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
 
+                    }
+
+                    .onFailure {
+                        response = it.localizedMessage!!
+                    }
             }
-
-                .onFailure {
-                    response = it.localizedMessage!!
-                }
         }
-
-        return response
-    }
 }

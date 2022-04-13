@@ -11,7 +11,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val token: String = NiveshActivity().getToken()
-        Toast.makeText(this@MainActivity,"toke - $token",Toast.LENGTH_SHORT).show()
+        NiveshActivity().getToken()
+//        Toast.makeText(this@MainActivity,"toke - $token",Toast.LENGTH_SHORT).show()
     }
 }
