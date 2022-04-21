@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.19610507246376813" />
         <entry key="niveshlibrary/src/main/res/drawable/cs_custom_progressbar.xml" value="0.1165" />
         <entry key="niveshlibrary/src/main/res/layout/activity_web_view.xml" value="0.23362175525339926" />
         <entry key="niveshlibrary/src/main/res/layout/activity_web_viewer.xml" value="0.19610507246376813" />

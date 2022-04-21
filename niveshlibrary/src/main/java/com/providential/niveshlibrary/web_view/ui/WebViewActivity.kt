@@ -3,6 +3,7 @@ package com.providential.niveshlibrary.web_view.ui
 import WebViewPresenterImpl
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -13,21 +14,23 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import android.view.ContextMenu
 import android.view.View
-import android.view.WindowManager
 import android.webkit.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.snackbar.Snackbar
 import com.providential.niveshlibrary.R
+import com.providential.niveshlibrary.interfaces.IPreferenceHelper
+import com.providential.niveshlibrary.util.PreferenceManager
 import com.providential.niveshlibrary.web_view.util.ClipboardUtils
 import com.providential.niveshlibrary.web_view.util.FileUtils
 import com.providential.niveshlibrary.web_view.util.PermissionUtils
+
 
 class WebViewActivity : AppCompatActivity(),
     WebViewPresenterImpl.View,
@@ -38,6 +41,7 @@ class WebViewActivity : AppCompatActivity(),
     private val presenter by lazy { WebViewPresenterImpl(this, this) }
 
     private var url = "https://www.nivesh.com/en"
+//    private var url = "https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_win_localstorage"
     private var filePathCallbackLollipop: ValueCallback<Array<Uri>>? = null
     private var filePathCallbackNormal: ValueCallback<Uri>? = null
     private var downloadManager: DownloadManager? = null
@@ -47,6 +51,8 @@ class WebViewActivity : AppCompatActivity(),
     }
     private val progressBar by lazy { findViewById<ProgressBar>(R.id.progress_bar) }
     private val webView by lazy { findViewById<WebView>(R.id.web_view) }
+
+    val preferenceHelper: IPreferenceHelper by lazy { PreferenceManager(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -374,7 +380,25 @@ class WebViewActivity : AppCompatActivity(),
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                localStorage(view!!)
+            }
+
             progressBar.visibility = View.VISIBLE
+        }
+
+        private fun localStorage(webView: WebView) {
+            val key = "token"
+            val `val`: String = preferenceHelper.getTokenId()
+            val key2 = "is_app"
+            val val2 = "101"
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                webView.evaluateJavascript("window.localStorage.setItem('$key','$`val`');", null)
+                webView.evaluateJavascript("window.localStorage.setItem('$key2','$val2');", null)
+            } else {
+                webView.loadUrl("javascript:localStorage.setItem('$key','$`val`');")
+                webView.loadUrl("javascript:localStorage.setItem('$key2','$val2');")
+            }
         }
 
         override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
@@ -488,5 +512,12 @@ class WebViewActivity : AppCompatActivity(),
 
     override fun onClick(v: View?) {
 
+    }
+
+    private fun sendData(data:String){
+        val intent = Intent()
+        intent.putExtra("keyName", data)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
     }
 }

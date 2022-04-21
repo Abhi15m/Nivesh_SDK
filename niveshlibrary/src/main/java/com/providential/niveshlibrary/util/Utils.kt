@@ -3,7 +3,7 @@ package com.providential.niveshlibrary.util
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.providential.niveshlibrary.BuildConfig
+import androidx.viewbinding.BuildConfig
 
 class Utils {
 
@@ -29,7 +29,7 @@ class Utils {
                         } else {
                             Log.e(
                                 TAG,
-                                "chunk " + i + " of " + chunkCount + ":" + sb.substring(
+                                "chunk $i of $chunkCount:" + sb.substring(
                                     4000 * i,
                                     max
                                 )

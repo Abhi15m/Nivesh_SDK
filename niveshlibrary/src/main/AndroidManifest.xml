@@ -13,14 +13,17 @@
 
     <application>
         <activity
+            android:name=".gold_module.GoldModule"
+            android:exported="false" />
+        <activity
             android:name=".ui.NiveshActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".web_view.ui.WebViewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

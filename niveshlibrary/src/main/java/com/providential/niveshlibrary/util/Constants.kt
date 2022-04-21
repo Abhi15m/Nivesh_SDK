@@ -5,4 +5,7 @@ object Constants {
 
     //Api
     const val GET_TOKEN = "getToken"
+    const val GET_PRODUCT_INVESTMENT = "getProductInvestment"
+
+    const val PRODUCT_INVESTMENT = 10101
 }

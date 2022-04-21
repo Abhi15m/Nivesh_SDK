@@ -22,6 +22,10 @@
             </intent-filter>
         </activity>
 
+        <meta-data
+            android:name="com.providential.nivesh_sdk.ClientId"
+            android:value="15pmghs05glcnhjhs8g6oprqu9"/>
+
     </application>
 
 </manifest>
