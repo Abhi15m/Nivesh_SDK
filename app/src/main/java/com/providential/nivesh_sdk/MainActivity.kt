@@ -67,8 +67,10 @@ class MainActivity : AppCompatActivity(), TokenListener,GoldListener {
         }
 
         btnWebView.setOnClickListener {
-            val intent = Intent(this,WebViewActivity::class.java)
-            startForResult.launch(intent)
+//            val intent = Intent(this,WebViewActivity::class.java)
+//            startForResult.launch(intent)
+
+            GoldModule().goldInvestment(this)
         }
 
     }

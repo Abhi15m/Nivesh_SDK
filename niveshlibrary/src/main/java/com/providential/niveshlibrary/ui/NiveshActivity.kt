@@ -37,7 +37,7 @@ class NiveshActivity : AppCompatActivity() {
 
 
 //        authListener.onStartedToken(context,true)
-
+            preferenceHelper.setApiKey("")
             var apiKey = ""
 
             context.packageManager.getApplicationInfo(

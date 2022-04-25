@@ -1,8 +1,12 @@
 package com.providential.niveshlibrary.gold_module
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.providential.niveshlibrary.R
@@ -16,6 +20,7 @@ import com.providential.niveshlibrary.util.Constants
 import com.providential.niveshlibrary.util.Coroutines
 import com.providential.niveshlibrary.util.PreferenceManager
 import com.providential.niveshlibrary.util.Utils
+import com.providential.niveshlibrary.web_view.ui.WebViewActivity
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
@@ -30,6 +35,11 @@ class GoldModule : AppCompatActivity(),TokenListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gold_module)
+    }
+
+    fun goldInvestment(context: Context){
+        val intent = Intent(context, WebViewActivity::class.java)
+        context.startActivity(intent)
     }
 
     fun getProductInvestment(context: Context,goldListener: GoldListener){
