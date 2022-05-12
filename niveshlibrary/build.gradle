@@ -82,7 +82,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.production'
                 artifactId = 'nivesh_lib'
-                version = '1.2.5'
+                version = '1.2.9'
             }
         }
     }
