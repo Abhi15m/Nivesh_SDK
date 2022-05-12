@@ -8,17 +8,16 @@ android {
 
     defaultConfig {
         applicationId "com.providential.nivesh_sdk"
-        minSdk 19
+        minSdk 21
         targetSdk 31
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

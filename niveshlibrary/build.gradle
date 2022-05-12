@@ -12,15 +12,15 @@ android {
     defaultConfig {
         minSdk 19
         targetSdk 30
-        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            multiDexKeepFile = file('multidex-config.txt')
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     buildFeatures{
@@ -33,6 +33,9 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    dexOptions {
+        javaMaxHeapSize = "4G"
+    }
 }
 
 dependencies {
@@ -44,7 +47,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    implementation("com.android.support:multidex:1.0.3")
 
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -83,7 +85,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.production'
                 artifactId = 'nivesh_lib'
-                version = '1.2.9'
+                version = '1.3.2'
             }
         }
     }
