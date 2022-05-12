@@ -10,5 +10,10 @@ interface IPreferenceHelper {
     fun getTokenId(): String
     fun setApiKey(apikey: String)
     fun getApiKey(): String
+
+    fun setLoginDetails(loginDetails:String)
+    fun getLoginDetails():String
+
+
     fun clearPrefs()
 }

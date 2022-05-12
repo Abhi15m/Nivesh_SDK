@@ -14,6 +14,11 @@ open class PreferenceManager constructor(context: Context) : IPreferenceHelper {
         const val TOKEN_REQUEST = "token_request"
         const val TOKEN_ID = "token_id_"
         const val API_KEY = "api_key"
+        const val REFRESH_TOKEN = "_refreshtoken"
+        const val TOKEN_TYPE = "_token_type"
+        const val CLIENT_CODE = "_client_code"
+        const val PARENT_CODE = "_parent_code"
+        const val LOGIN_DETAILS = "_login_details"
     }
 
     override fun setTokenRequest(tokenRequest:String) {
@@ -24,6 +29,13 @@ open class PreferenceManager constructor(context: Context) : IPreferenceHelper {
         return preferences[TOKEN_REQUEST] ?: ""
     }
 
+    override fun setApiKey(apikey:String) {
+        preferences[API_KEY] = apikey
+    }
+
+    override fun getApiKey(): String {
+        return preferences[API_KEY] ?: ""
+    }
 
     override fun setTokenId(tokenId: String) {
         preferences[TOKEN_ID] = tokenId
@@ -32,13 +44,16 @@ open class PreferenceManager constructor(context: Context) : IPreferenceHelper {
         return preferences[TOKEN_ID] ?: ""
     }
 
-    override fun setApiKey(apikey: String) {
-        preferences[API_KEY] = apikey
+    override fun setLoginDetails(loginDetails: String) {
+        preferences[LOGIN_DETAILS] = loginDetails
     }
 
-    override fun getApiKey(): String {
-        return preferences[API_KEY] ?: ""
+    override fun getLoginDetails(): String {
+        return preferences[LOGIN_DETAILS] ?: ""
     }
+
+
+
     override fun clearPrefs() {
         preferences.edit().clear().apply()
     }

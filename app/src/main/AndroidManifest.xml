@@ -11,7 +11,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Nivesh_SDK">
+        android:theme="@style/Theme.Nivesh_SDK"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -25,6 +26,20 @@
         <meta-data
             android:name="com.providential.nivesh_sdk.ClientId"
             android:value="15pmghs05glcnhjhs8g6oprqu9"/>
+
+        <meta-data
+            android:name="com.providential.nivesh_sdk.ThemeColor"
+            android:value="8334eb|FFFFFF|32cc21|3f6b3a"/> <!--header_color| txt_header_color| primary_button_color| secondary_button_color-->
+
+
+
+        <receiver android:name=".CustomBroadcastReceiver"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.providential.nivesh.passdata"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 

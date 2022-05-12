@@ -1,6 +1,7 @@
 package com.providential.niveshlibrary.exception
 
 import okhttp3.Request
+import okhttp3.ResponseBody
 import okio.Timeout
 import retrofit2.Call
 import retrofit2.Callback
@@ -23,7 +24,7 @@ class ResultCall<T>(private val delegate: Call<T>) : Call<Result<T>> {
                                 Result.success(response.body()!!)
                             )
                         )
-                    } else {
+                    } else{
                         callback.onResponse(
                             this@ResultCall,
                             Response.success(

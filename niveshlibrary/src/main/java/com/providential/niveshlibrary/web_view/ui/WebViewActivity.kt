@@ -3,7 +3,6 @@ package com.providential.niveshlibrary.web_view.ui
 import WebViewPresenterImpl
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -11,6 +10,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
@@ -19,17 +19,26 @@ import android.provider.Settings
 import android.view.ContextMenu
 import android.view.View
 import android.webkit.*
+import android.webkit.WebSettings.LOAD_NO_CACHE
+import android.webkit.WebView.setWebContentsDebuggingEnabled
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.snackbar.Snackbar
 import com.providential.niveshlibrary.R
+import com.providential.niveshlibrary.gold_module.gold_interface.GoldListener
 import com.providential.niveshlibrary.interfaces.IPreferenceHelper
+import com.providential.niveshlibrary.payment.PaymentActivity
+import com.providential.niveshlibrary.util.Constants.COLORS
+import com.providential.niveshlibrary.util.Constants.THEME_COLOR
+import com.providential.niveshlibrary.util.NetworkUtil
 import com.providential.niveshlibrary.util.PreferenceManager
+import com.providential.niveshlibrary.util.Utils
 import com.providential.niveshlibrary.web_view.util.ClipboardUtils
 import com.providential.niveshlibrary.web_view.util.FileUtils
 import com.providential.niveshlibrary.web_view.util.PermissionUtils
+import org.json.JSONObject
 
 
 class WebViewActivity : AppCompatActivity(),
@@ -38,10 +47,11 @@ class WebViewActivity : AppCompatActivity(),
     DownloadListener,
     View.OnCreateContextMenuListener {
 
-    private val presenter by lazy { WebViewPresenterImpl(this, this) }
+    private val presenter = WebViewPresenterImpl(this, this)
 
-    private var url = "https://www.nivesh.com/en"
-//    private var url = "https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_win_localstorage"
+    //    private var url = "https://www.nivesh.com/en"
+//    private var url = "https://sdkweb-sandbox.nivesh.com/"
+    private var url = "http://sdkweb.s3-website.ap-south-1.amazonaws.com/"
     private var filePathCallbackLollipop: ValueCallback<Array<Uri>>? = null
     private var filePathCallbackNormal: ValueCallback<Uri>? = null
     private var downloadManager: DownloadManager? = null
@@ -49,15 +59,27 @@ class WebViewActivity : AppCompatActivity(),
     private val coordinatorlayout by lazy {
         findViewById<CoordinatorLayout>(R.id.a_web_viewer_coordinatorlayout)
     }
-    private val progressBar by lazy { findViewById<ProgressBar>(R.id.progress_bar) }
     private val webView by lazy { findViewById<WebView>(R.id.web_view) }
+    private val llInternetLost by lazy { findViewById<LinearLayout>(R.id.llInternetLost) }
+    private val btnReload by lazy { findViewById<Button>(R.id.btnReload) }
+    private val preferenceHelper: IPreferenceHelper by lazy { PreferenceManager(this) }
 
-    val preferenceHelper: IPreferenceHelper by lazy { PreferenceManager(this) }
+    private var razorData: String = ""
+    private lateinit var mGoldListener:GoldListener
+    private lateinit var mContext: Context
+    private var mFlag:Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_web_view)
+       try {
+           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+               window.statusBarColor =
+                   Utils.manipulateColor(Color.parseColor("#$THEME_COLOR"), 0.8f)
+           }
+       }catch (ex:Exception){
+           ex.printStackTrace()
+       }
         IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
             .apply {
                 addAction(DownloadManager.ACTION_NOTIFICATION_CLICKED)
@@ -66,7 +88,40 @@ class WebViewActivity : AppCompatActivity(),
             }
 
         bindView()
-        presenter.validateUrl(url)
+
+
+        if (intent.hasExtra("payment_status")) {
+            razorData = intent.getStringExtra("payment_status")!!
+            val statusCode: Int = intent.getIntExtra("status_code", 200)
+            if (statusCode == 200) {
+                presenter.validateUrl("http://sdkweb.s3-website.ap-south-1.amazonaws.com/BuyGoldConfirm")
+            } else {
+                presenter.validateUrl("http://sdkweb.s3-website.ap-south-1.amazonaws.com/buygold/failed")
+            }
+        }else {
+
+            if (NetworkUtil.hasInternetConnection(this@WebViewActivity)) {
+                webView.visibility = View.VISIBLE
+                llInternetLost.visibility = View.GONE
+                presenter.validateUrl(url)
+            } else {
+                webView.visibility = View.GONE
+                llInternetLost.visibility = View.VISIBLE
+            }
+        }
+
+        btnReload.setOnClickListener {
+            onRefresh()
+        }
+
+//        mGoldListener = (intent.getSerializableExtra("listener") as GoldListener?)!!
+
+    }
+
+    fun initializeListener(goldListener: GoldListener,context: Context,flag:Int){
+        this.mGoldListener = goldListener
+        this.mContext = context
+        this.mFlag = flag
     }
 
     override fun onDestroy() {
@@ -74,7 +129,11 @@ class WebViewActivity : AppCompatActivity(),
         unregisterReceiver(downloadReceiver)
     }
 
-    override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenu.ContextMenuInfo) {
+    override fun onCreateContextMenu(
+        menu: ContextMenu,
+        v: View,
+        menuInfo: ContextMenu.ContextMenuInfo
+    ) {
         super.onCreateContextMenu(menu, v, menuInfo)
         val result = webView.hitTestResult
         presenter.onLongClick(result)
@@ -142,19 +201,61 @@ class WebViewActivity : AppCompatActivity(),
             settings.apply {
                 javaScriptEnabled = true
                 javaScriptCanOpenWindowsAutomatically = true
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    displayZoomControls = false
-                }
-                builtInZoomControls = true
-                setSupportZoom(true)
+                displayZoomControls = false
+                builtInZoomControls = false
+                setSupportZoom(false)
                 domStorageEnabled = true
+                useWideViewPort = true
+                setSupportMultipleWindows(true)
+                loadWithOverviewMode = true
+                cacheMode = LOAD_NO_CACHE
+                allowFileAccess = true
             }
-
+            clearCache(true)
+            setWebContentsDebuggingEnabled(true)
             webChromeClient = MyWebChromeClient()
             webViewClient = MyWebViewClient()
+            addJavascriptInterface(this@WebViewActivity, "AndroidPayment")
+            addJavascriptInterface(this@WebViewActivity, "AndroidPayment")
             setDownloadListener(this@WebViewActivity)
         }
     }
+
+    //    class JavaScriptHandler internal constructor(
+//        private val activity: Activity,
+//    ) {
+    @JavascriptInterface
+    fun returnResult(obj: String?) {
+        runOnUiThread(Runnable {
+            val intent = Intent(this@WebViewActivity, PaymentActivity()::class.java)
+            intent.putExtra("payment_data", obj)
+            startActivity(intent)
+        })
+    }
+
+    @JavascriptInterface
+    fun getRazorPayResponse(): String {
+        return razorData
+    }
+
+    @JavascriptInterface
+    fun closeModule(jsonData:String) {
+        runOnUiThread(Runnable {
+//            val jsonData = JSONObject(jsonData)
+          //  GoldModule().returnData(this,jsonData.toString())
+
+//            ResultListener().release(this,jsonData.toString(),0)
+            Intent().also { intent ->
+                intent.action = "com.providential.nivesh.passdata"
+                intent.putExtra("goldData",jsonData)
+                sendBroadcast(intent)
+            }
+            finish()
+        })
+    }
+
+//    }
+
 
     override fun loadUrl(url: String) {
         webView.loadUrl(url)
@@ -199,7 +300,7 @@ class WebViewActivity : AppCompatActivity(),
     }
 
     override fun setProgressBar(progress: Int) {
-        progressBar.progress = progress
+//        progressBar.progress = progress
     }
 
     override fun openEmail(email: String) {
@@ -277,7 +378,15 @@ class WebViewActivity : AppCompatActivity(),
     }
 
     override fun onRefresh() {
-        webView.reload()
+        if (NetworkUtil.hasInternetConnection(this@WebViewActivity)) {
+            webView.visibility = View.VISIBLE
+            llInternetLost.visibility = View.GONE
+            webView.reload()
+
+        } else {
+            webView.visibility = View.GONE
+            llInternetLost.visibility = View.VISIBLE
+        }
     }
 
     inner class MyWebChromeClient : WebChromeClient() {
@@ -370,40 +479,62 @@ class WebViewActivity : AppCompatActivity(),
     inner class MyWebViewClient : WebViewClient() {
 
         override fun onPageFinished(view: WebView?, url: String?) {
-            val view = view ?: return
-            val url = url ?: return
+            if (NetworkUtil.hasInternetConnection(view?.context!!)) {
+                webView.visibility = View.VISIBLE
+                llInternetLost.visibility = View.GONE
 
-            presenter.onReceivedTitle(view.title ?: "", url)
-            progressBar.visibility = View.GONE
+                val view = view ?: return
+                val url = url ?: return
+
+                presenter.onReceivedTitle(view.title ?: "", url)
+            } else {
+                webView.visibility = View.GONE
+                llInternetLost.visibility = View.VISIBLE
+            }
         }
 
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
+            if (NetworkUtil.hasInternetConnection(view?.context!!)) {
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                localStorage(view!!)
-            }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    localStorage(view)
+                    localRazorPayStorage(view)
+                }
 
-            progressBar.visibility = View.VISIBLE
-        }
-
-        private fun localStorage(webView: WebView) {
-            val key = "token"
-            val `val`: String = preferenceHelper.getTokenId()
-            val key2 = "is_app"
-            val val2 = "101"
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                webView.evaluateJavascript("window.localStorage.setItem('$key','$`val`');", null)
-                webView.evaluateJavascript("window.localStorage.setItem('$key2','$val2');", null)
+                webView.visibility = View.VISIBLE
+                llInternetLost.visibility = View.GONE
             } else {
-                webView.loadUrl("javascript:localStorage.setItem('$key','$`val`');")
-                webView.loadUrl("javascript:localStorage.setItem('$key2','$val2');")
+                webView.visibility = View.GONE
+                llInternetLost.visibility = View.VISIBLE
             }
         }
 
-        override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-            val view = view ?: return false
-            val url = url ?: return false
+
+        override fun shouldOverrideUrlLoading(
+            view1: WebView?,
+            request: WebResourceRequest?
+        ): Boolean {
+            val view = view1 ?: return false
+            val url = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                request?.url.toString() ?: return false
+            } else {
+                url ?: return false
+            }
+
+//            if (NetworkUtil.hasInternetConnection(view.context)){
+//
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                    view.loadUrl(request?.url.toString())
+//                }else{
+//                    view.loadUrl(url)
+//                }
+//                webView.visibility = View.VISIBLE
+//                llInternetLost.visibility = View.GONE
+//            }else {
+//                webView.visibility = View.GONE
+//                llInternetLost.visibility = View.VISIBLE
+//            }
 
             return when {
                 url.endsWith(".mp4") -> {
@@ -425,7 +556,7 @@ class WebViewActivity : AppCompatActivity(),
                         }
                     true
                 }
-                else -> super.shouldOverrideUrlLoading(view, url)
+                else -> super.shouldOverrideUrlLoading(view, request)
             }
         }
     }
@@ -514,10 +645,32 @@ class WebViewActivity : AppCompatActivity(),
 
     }
 
-    private fun sendData(data:String){
-        val intent = Intent()
-        intent.putExtra("keyName", data)
-        setResult(Activity.RESULT_OK, intent)
-        finish()
+    private fun localStorage(webView: WebView) {
+        val key1 = "token"
+        val val1: String = preferenceHelper.getTokenId()
+        val key2 = "login_details"
+        val val2: String = preferenceHelper.getLoginDetails()
+        val key3 = "theme_color"
+        val val3 = COLORS.split("|").toTypedArray()
+        val clr1 = val3[0]
+        val clr2 = val3[1]
+        val clr3 = val3[2]
+        val clr4 = val3[3]
+        val jsonObject = JSONObject()
+        jsonObject.put("bg_header_color","#$clr1")
+        jsonObject.put("txt_header_color","#$clr2")
+        jsonObject.put("primary_button_color","#$clr3")
+        jsonObject.put("secondary_button_color","#$clr4")
+
+        webView.evaluateJavascript("window.localStorage.setItem('$key1','$val1');", null)
+        webView.evaluateJavascript("window.localStorage.setItem('$key2','$val2');", null)
+        webView.evaluateJavascript("window.localStorage.setItem('$key3','$jsonObject');", null)
+
+    }
+
+    private fun localRazorPayStorage(view: WebView) {
+        val key = "razorpaydata"
+        val `val`: String = razorData
+        view.evaluateJavascript("window.localStorage.setItem('$key','$`val`');",null)
     }
 }
