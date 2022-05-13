@@ -10,6 +10,9 @@ android {
     compileSdk 29
 
     defaultConfig {
+        configurations.all {
+            resolutionStrategy { force 'androidx.core:core-ktx:1.6.0' }
+        }
         minSdk 19
         targetSdk 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -35,14 +38,6 @@ android {
     dexOptions {
         javaMaxHeapSize = "4G"
     }
-}
-ext {
-    buildToolsVersion = "29.0.2"
-    minSdkVersion = 19
-    compileSdkVersion = 29
-    targetSdkVersion = 29
-    googlePlayServicesAuthVersion = "16.0.1"
-    androidXCore = "1.6.0"
 }
 
 dependencies {
