@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity(),GoldListener{
     private val BUY_GOALD : Int = 101
     private val PRODUCT_INVESTMENT : Int = 102
     private val customBroadcastReceiver = CustomBroadcastReceiver()
+    var progressDialog:ProgressDialog ?= null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity(),GoldListener{
 
         btnTest = findViewById(R.id.btnTest)
         btnWebView = findViewById(R.id.btnWebView)
-
+        progressDialog = ProgressDialog(this)
 //        setWebView()
         btnTest.setOnClickListener {
         try {
@@ -85,13 +86,13 @@ class MainActivity : AppCompatActivity(),GoldListener{
     }
 
     fun showHideProgress(isShow:Boolean,context: Context){
-        val progressDialog = ProgressDialog(context)
-        progressDialog.setTitle("Please wait")
-        progressDialog.setMessage("Application is loading, please wait")
+//        val progressDialog = ProgressDialog(context)
+        progressDialog?.setTitle("Please wait")
+        progressDialog?.setMessage("Application is loading, please wait")
         if (isShow) {
-            progressDialog.show()
+            progressDialog?.show()
         }else{
-            progressDialog.dismiss()
+            progressDialog?.dismiss()
         }
     }
 
