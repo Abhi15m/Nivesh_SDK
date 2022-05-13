@@ -1,8 +1,6 @@
 package com.providential.niveshlibrary.gold_module.gold_interface
 
 import android.content.Context
-import android.os.Parcel
-import android.os.Parcelable
 import com.google.gson.JsonObject
 
 interface GoldListener{
