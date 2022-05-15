@@ -1,5 +1,7 @@
 package com.providential.niveshlibrary.exception
 
+import android.accounts.AuthenticatorException
+import android.app.AuthenticationRequiredException
 import okhttp3.Request
 import okhttp3.ResponseBody
 import okio.Timeout

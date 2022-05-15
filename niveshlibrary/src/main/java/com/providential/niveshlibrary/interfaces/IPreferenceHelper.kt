@@ -11,6 +11,9 @@ interface IPreferenceHelper {
     fun setApiKey(apikey: String)
     fun getApiKey(): String
 
+    fun setRefreshToken(refreshToken: String)
+    fun getRefreshToken(): String
+
     fun setLoginDetails(loginDetails:String)
     fun getLoginDetails():String
 

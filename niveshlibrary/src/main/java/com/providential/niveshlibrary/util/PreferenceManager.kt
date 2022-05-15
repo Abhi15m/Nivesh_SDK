@@ -37,6 +37,14 @@ open class PreferenceManager constructor(context: Context) : IPreferenceHelper {
         return preferences[API_KEY] ?: ""
     }
 
+    override fun setRefreshToken(refreshToken: String) {
+        preferences[REFRESH_TOKEN] = refreshToken
+    }
+
+    override fun getRefreshToken(): String {
+        return preferences[REFRESH_TOKEN] ?: ""
+    }
+
     override fun setTokenId(tokenId: String) {
         preferences[TOKEN_ID] = tokenId
     }

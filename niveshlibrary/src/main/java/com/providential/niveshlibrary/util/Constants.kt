@@ -10,6 +10,7 @@ object Constants {
     //Api
     const val GET_TOKEN = "auth/v1/login"
     const val GET_PRODUCT_INVESTMENT = "common/v1/getProductInvestment"
+    const val GET_REFRESH_TOKEN = "auth/v1/getfreshtoken"
 
     const val INITIATE_GOLD_INVESTMENT = 10101
     var THEME_COLOR : String = ""

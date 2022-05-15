@@ -21,4 +21,7 @@ interface ApiInterface {
     @POST(Constants.GET_PRODUCT_INVESTMENT)
     suspend fun getProductInvestment(@Header("authorization") token:String, @Body requestBody: RequestBody):
             Result<JsonObject>
+
+    @POST(Constants.GET_REFRESH_TOKEN)
+    suspend fun getRefreshToken(@Body requestBody: RequestBody): Result<JsonObject>
 }
