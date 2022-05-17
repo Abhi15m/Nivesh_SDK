@@ -7,22 +7,13 @@ plugins {
 }
 
 android {
-    compileSdk 30
-    configurations.all {
-        resolutionStrategy { force 'androidx.core:core-ktx:1.6.0' }
-    }
+    compileSdk 31
     defaultConfig {
         minSdk 19
-        targetSdk 30
+        targetSdk 31
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
-//    configurations.all {
-//        resolutionStrategy {
-//            force 'androidx.core:core-ktx:1.6.0'
-//            force 'androidx.core:core:1.6.0'
-//        }
-//    }
 
     buildTypes {
         release {
@@ -49,16 +40,12 @@ android {
         javaMaxHeapSize = "4G"
     }
 }
-ext {
-    supportVersion = "30.0.0"
-}
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.21'
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
@@ -69,13 +56,13 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:4.9.3"
 
     // Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
 
     // Coroutine Lifecycle Scopes
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:1.6.0"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:1.6.0"
-    implementation "androidx.activity:activity-ktx:1.3.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.1"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.1"
+    implementation "androidx.activity:activity-ktx:1.4.0"
 
     // OKHttp Lib
     // define a BOM and its version
@@ -86,8 +73,8 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor")
 
     //dagger-hilt
-    implementation("com.google.dagger:hilt-android:2.37")
-    kapt("com.google.dagger:hilt-android-compiler:2.37")
+    implementation("com.google.dagger:hilt-android:2.38.1")
+    kapt("com.google.dagger:hilt-android-compiler:2.38.1")
 
     //Razorpay
     implementation 'com.razorpay:checkout:1.6.18'
