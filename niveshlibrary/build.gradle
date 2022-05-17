@@ -47,9 +47,12 @@ android {
         javaMaxHeapSize = "4G"
     }
 }
+ext {
+    supportVersion = "30.0.0"
+}
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.5.0"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.21'
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.3.0'
@@ -99,7 +102,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.production'
                 artifactId = 'nivesh_lib'
-                version = '0.0.1'
+                version = '0.0.2'
             }
         }
     }
