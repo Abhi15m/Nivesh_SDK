@@ -96,6 +96,7 @@ class MainActivity : AppCompatActivity(),GoldListener{
 
            GoldModule().goldInvestment(this@MainActivity,jsonObject,BUY_GOALD,this)
 
+
         }catch (e:Exception){
             e.printStackTrace()
         }
