@@ -39,10 +39,13 @@ class ResultCall<T>(private val delegate: Call<T>) : Call<Result<T>> {
                 }
 
                 override fun onFailure(call: Call<T>, t: Throwable) {
-                    val errorMessage = when (t) {
-                        is IOException -> "No internet connection"
-                        is HttpException -> "Something went wrong!"
-                        else -> t.localizedMessage
+                    val exception = t as HttpException
+                    val errorMessage = when (exception.code()) {
+                        401 -> "Unauthorized"
+                        403 -> "Token expired"
+                        503 -> "No internet connection"
+
+                        else -> "Something went wrong!"
                     }
                     callback.onResponse(
                         this@ResultCall,
