@@ -86,8 +86,8 @@ afterEvaluate {
             release(MavenPublication){
                 from components.release
                 groupId = 'com.github.Abhi15m'
-                artifactId = 'Nivesh_SDK'
-                version = '1.6.7'
+                artifactId = 'NiveshSdk'
+                version = '0.0.1'
             }
         }
     }
