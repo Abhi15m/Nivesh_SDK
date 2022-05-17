@@ -50,7 +50,7 @@ class WebViewActivity : AppCompatActivity(),
     private val presenter = WebViewPresenterImpl(this, this)
 
     //    private var url = "https://www.nivesh.com/en"
-//    private var url = "https://sdkweb-sandbox.nivesh.com/"
+//    private var url = "https://sdkweb-sandbox.nivesh.com"
     private var url = "http://sdkweb.s3-website.ap-south-1.amazonaws.com/"
     private var filePathCallbackLollipop: ValueCallback<Array<Uri>>? = null
     private var filePathCallbackNormal: ValueCallback<Uri>? = null

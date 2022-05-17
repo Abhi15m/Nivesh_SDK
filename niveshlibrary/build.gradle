@@ -80,10 +80,6 @@ dependencies {
     implementation 'com.razorpay:checkout:1.6.18'
 }
 
-kapt {
-    correctErrorTypes true
-}
-
 afterEvaluate {
     publishing{
         publications{
