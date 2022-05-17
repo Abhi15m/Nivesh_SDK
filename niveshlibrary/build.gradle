@@ -81,6 +81,7 @@ dependencies {
 
     //Razorpay
     implementation 'com.razorpay:checkout:1.6.18'
+
 }
 
 afterEvaluate {
@@ -90,7 +91,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.Abhi15m'
                 artifactId = 'NiveshSdk'
-                version = '1.0.3'
+                version = '1.0.4'
             }
         }
     }
