@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity(),GoldListener{
             jsonObject.put("clientData", jsonObjectData)
             jsonObject.put("partnerData", jsonObjectPartnerData)
 
-           GoldModule().goldInvestment(this@MainActivity,jsonObject,BUY_GOALD,this)
+           GoldModule().initiateTransaction(this@MainActivity,jsonObject,BUY_GOALD,this)
 
 
         }catch (e:Exception){

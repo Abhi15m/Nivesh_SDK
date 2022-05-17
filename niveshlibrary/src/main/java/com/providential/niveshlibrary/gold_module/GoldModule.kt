@@ -29,7 +29,7 @@ class GoldModule : AppCompatActivity(),TokenListener,RefreshTokenListener{
         setContentView(R.layout.activity_gold_module)
     }
 
-    fun goldInvestment(context: Context, jsonObject: JSONObject, flag: Int, goldListener: GoldListener){
+    fun initiateTransaction(context: Context, jsonObject: JSONObject, flag: Int, goldListener: GoldListener){
         this.mGoldListener = goldListener
         this.mContext = context
         this.mFlag = flag
