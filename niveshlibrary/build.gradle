@@ -8,7 +8,9 @@ plugins {
 
 android {
     compileSdk 30
-
+    configurations.all {
+        resolutionStrategy { force 'androidx.core:core-ktx:1.6.0' }
+    }
     defaultConfig {
         minSdk 19
         targetSdk 30
