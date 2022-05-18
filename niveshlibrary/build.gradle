@@ -4,6 +4,8 @@ plugins {
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
     id 'maven-publish'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -12,7 +14,7 @@ android {
         minSdk 19
         targetSdk 31
         versionCode 1
-        versionName '2.0.1'
+        versionName '2.0.2'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -84,7 +86,13 @@ dependencies {
     //Razorpay
     implementation 'com.razorpay:checkout:1.6.18'
 
+    implementation platform('com.google.firebase:firebase-bom:30.0.1')
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    // For use in the CustomKeySamples -- for testing Google Api Availability.
+    implementation 'com.google.android.gms:play-services-base:18.0.1'
 }
+
 afterEvaluate {
     publishing{
         publications{
@@ -92,7 +100,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.Abhi15m'
                 artifactId = 'Nivesh_SDK'
-                version = '2.0.1'
+                version = '2.0.2'
             }
         }
     }

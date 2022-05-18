@@ -118,6 +118,8 @@ class WebViewActivity : AppCompatActivity(),
 
 //        mGoldListener = (intent.getSerializableExtra("listener") as GoldListener?)!!
 
+        throw RuntimeException("Test Crash") // Force a crash
+
     }
 
     fun initializeListener(goldListener: GoldListener,context: Context,flag:Int){
@@ -658,11 +660,15 @@ class WebViewActivity : AppCompatActivity(),
         val clr2 = val3[1]
         val clr3 = val3[2]
         val clr4 = val3[3]
+        val clr5 = val3[4]
+        val clr6 = val3[5]
         val jsonObject = JSONObject()
         jsonObject.put("bg_header_color","#$clr1")
         jsonObject.put("txt_header_color","#$clr2")
         jsonObject.put("primary_button_color","#$clr3")
         jsonObject.put("secondary_button_color","#$clr4")
+        jsonObject.put("primary_text_color","#$clr5")
+        jsonObject.put("secondary_text_color","#$clr6")
 
         webView.evaluateJavascript("window.localStorage.setItem('$key1','$val1');", null)
         webView.evaluateJavascript("window.localStorage.setItem('$key2','$val2');", null)
