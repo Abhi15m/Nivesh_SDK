@@ -94,7 +94,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.Abhi15m'
                 artifactId = 'Nivesh_SDK'
-                version = '1.0.4'
+                version = '1.0.1'
             }
         }
     }
