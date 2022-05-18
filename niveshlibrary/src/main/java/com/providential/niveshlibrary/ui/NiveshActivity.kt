@@ -5,12 +5,14 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.providential.niveshlibrary.R
 import com.providential.niveshlibrary.di.NetworkModule
 import com.providential.niveshlibrary.gold_module.gold_interface.GoldListener
 import com.providential.niveshlibrary.interfaces.IPreferenceHelper
 import com.providential.niveshlibrary.interfaces.RefreshTokenListener
 import com.providential.niveshlibrary.interfaces.TokenListener
+import com.providential.niveshlibrary.model.DeviceInfo
 import com.providential.niveshlibrary.util.Constants.COLORS
 import com.providential.niveshlibrary.util.Constants.THEME_COLOR
 import com.providential.niveshlibrary.util.Coroutines
@@ -44,11 +46,15 @@ class NiveshActivity : AppCompatActivity() {
                 COLORS = bundle.getString("com.providential.nivesh_sdk.ThemeColor")!!
                 val clr  = COLORS.split("|").toTypedArray()
                 THEME_COLOR = clr[0]
+
+                val appname = this.loadLabel(context.packageManager).toString()
+                preferenceHelper.setAppName(appname)
+
             }
         return apiKey
     }
 
-    fun getToken(
+    fun initiateTransaction(
         context: Context,
         jsonObject: JSONObject,
         authListener: TokenListener,
@@ -60,7 +66,14 @@ class NiveshActivity : AppCompatActivity() {
         preferenceHelper.setApiKey("")
         preferenceHelper.clearPrefs()
 
-        jsonObject.put("clientID", getApiKey(context, preferenceHelper))
+        val activationKey :String = getApiKey(context, preferenceHelper)
+
+        jsonObject.put("ActivationKey", activationKey)
+        jsonObject.put("clientID", activationKey)
+
+        val deviceInfo: DeviceInfo = Utils.getDeviceInfo(context)
+        val platformInfo : JSONObject = JSONObject(Gson().toJson(deviceInfo))
+        jsonObject.put("device_info", platformInfo)
         preferenceHelper.setTokenRequest(jsonObject.toString())
 
         Utils.showLog("GetToken", "-->$jsonObject")
@@ -70,7 +83,6 @@ class NiveshActivity : AppCompatActivity() {
             NetworkModule.provideRetrofit().getTokenAsync(body)
                 .onSuccess { response1 ->
                     try {
-                        val jsonObject = response1
                         authListener.onStartedToken(context, false, flag)
                         authListener.onSuccessToken(context, response1, flag)
                         preferenceHelper.setTokenId(response1.response.AuthenticationResult.IdToken)
@@ -115,7 +127,20 @@ class NiveshActivity : AppCompatActivity() {
 
                 }
                 .onFailure{
-                    refreshTokenListener.onErrorRefreshToken(context,it.localizedMessage!!,flag)
+                    try {
+                        refreshTokenListener.onErrorRefreshToken(
+                            context,
+                            Utils.errorMessage(it),
+                            flag
+                        )
+                    }catch (ex:Exception){
+                        ex.printStackTrace()
+                        refreshTokenListener.onErrorRefreshToken(
+                            context,
+                            it.localizedMessage!!,
+                            flag
+                        )
+                    }
                 }
         }
     }
@@ -145,13 +170,19 @@ class NiveshActivity : AppCompatActivity() {
                     }
 
                 }
-                .onFailure{
-                    val exception = it as HttpException
-                    if (exception.code() == 403){
+                .onFailure {
+                    try {
+                        val exception = it as HttpException
+                        if (exception.code() == 403) {
                             refreshToken(context, listenerContext, flag)
-                    }else {
+                        } else {
+                            goldListener.onLoad(context, false, flag)
+                            goldListener.onFailure(context, Utils.errorMessage(it), flag)
+                        }
+                    }catch (ex : Exception){
+                        ex.printStackTrace()
                         goldListener.onLoad(context, false, flag)
-                        goldListener.onFailure(context, it.localizedMessage, flag)
+                        goldListener.onFailure(context, it.localizedMessage!!, flag)
                     }
                 }
         }

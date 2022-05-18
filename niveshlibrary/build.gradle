@@ -8,12 +8,11 @@ plugins {
 
 android {
     compileSdk 31
-    configurations.all {
-        resolutionStrategy { force 'androidx.core:core-ktx:1.6.0' }
-    }
     defaultConfig {
         minSdk 19
         targetSdk 31
+        versionCode 1
+        versionName '1.0.1'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -22,11 +21,15 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+            buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")
         }
         debug {
             debuggable true
             minifyEnabled true
             multiDexEnabled true
+            buildConfigField("long", "VERSION_CODE", "${defaultConfig.versionCode}")
+            buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")
         }
     }
     buildFeatures{

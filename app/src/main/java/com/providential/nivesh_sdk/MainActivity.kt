@@ -47,16 +47,16 @@ class MainActivity : AppCompatActivity(),GoldListener{
             val addressClientData = JSONObject()
             val addressPartnerData = JSONObject()
 
-            addressClientData.put("AddressLine1","")
-            addressClientData.put("AddressLine2","")
-            addressClientData.put("State","")
+            addressClientData.put("addressLine1","")
+            addressClientData.put("addressLine2","")
+            addressClientData.put("state","")
             addressClientData.put("city","")
             addressClientData.put("country","")
             addressClientData.put("pincode","")
 
-            addressPartnerData.put("AddressLine1","")
-            addressPartnerData.put("AddressLine2","")
-            addressPartnerData.put("State","")
+            addressPartnerData.put("addressLine1","")
+            addressPartnerData.put("addressLine2","")
+            addressPartnerData.put("state","")
             addressPartnerData.put("city","")
             addressPartnerData.put("country","")
             addressPartnerData.put("pincode","")
@@ -66,11 +66,11 @@ class MainActivity : AppCompatActivity(),GoldListener{
             jsonObjectData.put("emailId", "client@nivesh.com")
             jsonObjectData.put("phoneNo", "+918668619073")
             jsonObjectData.put("pan", "XXXXXXXXXXXXX")
-            jsonObjectData.put("AccountNo", "XXXXXXXXXXXXX")
-            jsonObjectData.put("IfscCode", "XXXXXXXXXXXXX")
+            jsonObjectData.put("accountNo", "XXXXXXXXXXXXX")
+            jsonObjectData.put("ifscCode", "XXXXXXXXXXXXX")
             jsonObjectData.put("gender", "XXXXXXXXXXXXX")
             jsonObjectData.put("dob", "XXXXXXXXXXXXX")
-            jsonObjectData.put("Address", addressClientData)
+            jsonObjectData.put("address", addressClientData)
 
 
             jsonObjectPartnerData.put("id", "")
@@ -80,15 +80,15 @@ class MainActivity : AppCompatActivity(),GoldListener{
             jsonObjectPartnerData.put("pan", "XXXXXXXXXXXXX")
             jsonObjectPartnerData.put("arn", "XXXXXXXXXXXXX")
             jsonObjectPartnerData.put("euin", "XXXXXXXXXXXXX")
-            jsonObjectPartnerData.put("AccountNo", "XXXXXXXXXXXXX")
-            jsonObjectPartnerData.put("IfscCode", "XXXXXXXXXXXXX")
+            jsonObjectPartnerData.put("accountNo", "XXXXXXXXXXXXX")
+            jsonObjectPartnerData.put("ifscCode", "XXXXXXXXXXXXX")
             jsonObjectPartnerData.put("gender", "XXXXXXXXXXXXX")
             jsonObjectPartnerData.put("dob", "XXXXXXXXXXXXX")
-            jsonObjectPartnerData.put("Address", addressPartnerData)
+            jsonObjectPartnerData.put("address", addressPartnerData)
 
-            jsonObject.put("userRefNo", "100")
+//            jsonObject.put("userRefNo", "100")
             jsonObject.put("workFlowID", "10")
-            jsonObject.put("niveshClientcode", "10")
+            jsonObject.put("niveshClientcode", "1014000002")
             jsonObject.put("niveshPartnercode", "10")
             jsonObject.put("isClinetInitaited", false)
             jsonObject.put("clientData", jsonObjectData)
@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity(),GoldListener{
         btnWebView.setOnClickListener {
             try {
                 val jsonObject = JSONObject()
-                jsonObject.put("clientcode","1014000001")
+                jsonObject.put("client_code","1014000002")
                 jsonObject.put("ProductId",10)
                 GoldModule().getProductInvestment(this@MainActivity,jsonObject,PRODUCT_INVESTMENT,this)
             }catch (ex:Exception){
@@ -146,6 +146,7 @@ class MainActivity : AppCompatActivity(),GoldListener{
 
     override fun onFailure(context: Context, message: String, flag: Int) {
         Utils.showLog("MainActivity","Product Investment Error: $message")
+        Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
     }
 
 

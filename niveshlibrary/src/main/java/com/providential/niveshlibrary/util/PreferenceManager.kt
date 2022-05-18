@@ -19,6 +19,7 @@ open class PreferenceManager constructor(context: Context) : IPreferenceHelper {
         const val CLIENT_CODE = "_client_code"
         const val PARENT_CODE = "_parent_code"
         const val LOGIN_DETAILS = "_login_details"
+        const val APP_NAME = "_app_name"
     }
 
     override fun setTokenRequest(tokenRequest:String) {
@@ -60,6 +61,13 @@ open class PreferenceManager constructor(context: Context) : IPreferenceHelper {
         return preferences[LOGIN_DETAILS] ?: ""
     }
 
+    override fun setAppName(appName: String) {
+        preferences[APP_NAME] = appName
+    }
+
+    override fun getAppName(): String {
+        return preferences[APP_NAME] ?: ""
+    }
 
 
     override fun clearPrefs() {

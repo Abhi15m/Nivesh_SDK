@@ -34,7 +34,7 @@ class GoldModule : AppCompatActivity(),TokenListener,RefreshTokenListener{
         this.mContext = context
         this.mFlag = flag
 
-        NiveshActivity().getToken(context,jsonObject,this,INITIATE_GOLD_INVESTMENT,true)
+        NiveshActivity().initiateTransaction(context,jsonObject,this,INITIATE_GOLD_INVESTMENT,true)
     }
 
     fun getProductInvestment(context: Context,jsonObject: JSONObject,flag: Int, goldListener: GoldListener){

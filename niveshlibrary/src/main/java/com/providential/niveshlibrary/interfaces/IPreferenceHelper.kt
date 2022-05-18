@@ -16,6 +16,8 @@ interface IPreferenceHelper {
 
     fun setLoginDetails(loginDetails:String)
     fun getLoginDetails():String
+    fun setAppName(appName:String)
+    fun getAppName():String
 
 
     fun clearPrefs()
