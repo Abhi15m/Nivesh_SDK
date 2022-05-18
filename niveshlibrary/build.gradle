@@ -86,7 +86,6 @@ dependencies {
     implementation 'com.razorpay:checkout:1.6.18'
 
 }
-
 afterEvaluate {
     publishing{
         publications{
