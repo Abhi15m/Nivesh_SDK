@@ -35,17 +35,28 @@ internal class NiveshActivity : AppCompatActivity() {
         var apiKey = ""
         context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
             .apply {
-
                 val bundle = metaData
-                apiKey = bundle.getString("com.providential.nivesh_sdk.ClientId")!!
-                preferenceHelper.setApiKey(apiKey)
+                try {
+                    apiKey = bundle.getString("com.providential.nivesh_sdk.ClientId")!!
+                    preferenceHelper.setApiKey(apiKey)
+                }catch (ex:Exception){
+                    ex.printStackTrace()
+                }
 
-                COLORS = bundle.getString("com.providential.nivesh_sdk.ThemeColor")!!
-                val clr = COLORS.split("|").toTypedArray()
-                THEME_COLOR = clr[0]
+                try {
+                    COLORS = bundle.getString("com.providential.nivesh_sdk.ThemeColor")!!
+                    val clr = COLORS.split("|").toTypedArray()
+                    THEME_COLOR = clr[0]
+                }catch (ex:Exception){
+                    ex.printStackTrace()
+                }
 
-                val appname = this.loadLabel(context.packageManager).toString()
-                preferenceHelper.setAppName(appname)
+                try {
+                    val appname = this.loadLabel(context.packageManager).toString()
+                    preferenceHelper.setAppName(appname)
+                }catch (ex:Exception){
+                    ex.printStackTrace()
+                }
 
             }
         return apiKey

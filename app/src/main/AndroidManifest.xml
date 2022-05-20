@@ -29,7 +29,7 @@
 
         <meta-data
             android:name="com.providential.nivesh_sdk.ThemeColor"
-            android:value="8334eb|8334eb|8334eb|8334eb|8334eb|8334eb"/> <!--header_color| txt_header_color| primary_button_color| secondary_button_color
+            android:value="8334eb|FFFFFF|8334eb|8334eb|8334eb|8334eb"/> <!--header_color| txt_header_color| primary_button_color| secondary_button_color
             | primary_text_color| secondary_text_color-->
 
 

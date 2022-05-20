@@ -29,20 +29,16 @@ class PaymentActivity : AppCompatActivity(), PaymentResultWithDataListener{
     }
 
     private fun startPayment() {
-//        this.mContext = context
-
         try {
             val data = intent.getStringExtra("payment_data")
            val obj = JSONObject(data.toString())
             val co = Checkout()
             co.setKeyID(obj.getString("Key"))
-//            co.setKeyID("rzp_test_bcrt5VZSda3cRi")
             val options = JSONObject()
             options.put("currency", "INR")
             options.put("name", preferenceHelper?.getAppName())
             options.put("description", "")
             options.put("image", "")
-//            options.put("order_id", "order_JRr1ntilgNPGMH")
             options.put("order_id", obj.getString("Id"))
 //            options.put("amount", jsonObject.getString("amount"))
 //            options.put("amount", jsonObject.getString("amount"))
@@ -58,11 +54,10 @@ class PaymentActivity : AppCompatActivity(), PaymentResultWithDataListener{
             themes.put("color", "#$THEME_COLOR")
             options.put("theme", themes)
             val preFill = JSONObject()
-            preFill.put("email", "abhinav.kumar@nivesh.com")
-            preFill.put("contact", "8073895204")
+            preFill.put("email", obj.getString("CustmerEmail"))
+            preFill.put("contact", obj.getString("CustmerPhone"))
             options.put("prefill", preFill)
             co.open(this@PaymentActivity, options)
-//            co.open(mContext as Activity?, options)
         } catch (e: Exception) {
             Toast.makeText(this@PaymentActivity, "Error in payment: " + e.message, Toast.LENGTH_SHORT).show()
             e.printStackTrace()

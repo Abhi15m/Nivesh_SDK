@@ -21,13 +21,12 @@ import android.view.View
 import android.webkit.*
 import android.webkit.WebSettings.LOAD_NO_CACHE
 import android.webkit.WebView.setWebContentsDebuggingEnabled
-import android.widget.*
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.snackbar.Snackbar
 import com.providential.niveshlibrary.R
-import com.providential.niveshlibrary.gold_module.gold_interface.GoldListener
 import com.providential.niveshlibrary.interfaces.IPreferenceHelper
 import com.providential.niveshlibrary.payment.PaymentActivity
 import com.providential.niveshlibrary.util.Constants.COLORS
@@ -204,9 +203,16 @@ internal class WebViewActivity : AppCompatActivity(),
             setOnLongClickListener {
                 return@setOnLongClickListener true
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                CookieManager.getInstance().removeAllCookies(null)
+                CookieManager.getInstance().flush();
+            };
+
+            WebStorage.getInstance().deleteAllData()
             isLongClickable = false
             isHapticFeedbackEnabled = false
             setWebContentsDebuggingEnabled(true)
+            clearHistory()
             webChromeClient = MyWebChromeClient()
             webViewClient = MyWebViewClient()
             addJavascriptInterface(this@WebViewActivity, "AndroidPayment")
@@ -486,7 +492,7 @@ internal class WebViewActivity : AppCompatActivity(),
             if (NetworkUtil.hasInternetConnection(view?.context!!)) {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    localStorage(view)
+                    localStorages(view)
                     localRazorPayStorage(view)
                 }
             } else {
@@ -629,36 +635,51 @@ internal class WebViewActivity : AppCompatActivity(),
 
     }
 
-    private fun localStorage(webView: WebView) {
-        val key1 = "token"
-        val val1: String = preferenceHelper.getTokenId()
-        val key2 = "login_details"
-        val val2: String = preferenceHelper.getLoginDetails()
-        val key3 = "theme_color"
-        val val3 = COLORS.split("|").toTypedArray()
-        val clr1 = val3[0]
-        val clr2 = val3[1]
-        val clr3 = val3[2]
-        val clr4 = val3[3]
-        val clr5 = val3[4]
-        val clr6 = val3[5]
-        val jsonObject = JSONObject()
-        jsonObject.put("bg_header_color", "#$clr1")
-        jsonObject.put("txt_header_color", "#$clr2")
-        jsonObject.put("primary_button_color", "#$clr3")
-        jsonObject.put("secondary_button_color", "#$clr4")
-        jsonObject.put("primary_text_color", "#$clr5")
-        jsonObject.put("secondary_text_color", "#$clr6")
+    private fun localStorages(webView: WebView) {
+        try {
+            val key1 = "token"
+            val val1: String = preferenceHelper.getTokenId()
+            webView.evaluateJavascript("window.localStorage.setItem('$key1','$val1');", null)
 
-        webView.evaluateJavascript("window.localStorage.setItem('$key1','$val1');", null)
-        webView.evaluateJavascript("window.localStorage.setItem('$key2','$val2');", null)
-        webView.evaluateJavascript("window.localStorage.setItem('$key3','$jsonObject');", null)
+            val key2 = "login_details"
+            val val2: String = preferenceHelper.getLoginDetails()
+            webView.evaluateJavascript("window.localStorage.setItem('$key2','$val2');", null)
+            val jsonObject = JSONObject()
+            val key3 = "theme_color"
+            val val3 = COLORS.split("|").toTypedArray()
+            try {
+                val clr1 = val3[0]
+                jsonObject.put("bg_header_color", "#$clr1")
+                val clr2 = val3[1]
+                jsonObject.put("txt_header_color", "#$clr2")
+                val clr3 = val3[2]
+                jsonObject.put("primary_button_color", "#$clr3")
+                val clr4 = val3[3]
+                jsonObject.put("secondary_button_color", "#$clr4")
+                val clr5 = val3[4]
+                jsonObject.put("primary_text_color", "#$clr5")
+                val clr6 = val3[5]
+                jsonObject.put("secondary_text_color", "#$clr6")
+                webView.evaluateJavascript("window.localStorage.setItem('$key3','$jsonObject');", null)
+            }catch (ex:Exception){
+                ex.printStackTrace()
+                webView.evaluateJavascript("window.localStorage.setItem('$key3','$jsonObject');", null)
+            }
+
+
+        }catch (ex : Exception){
+            ex.printStackTrace()
+        }
 
     }
 
     private fun localRazorPayStorage(view: WebView) {
-        val key = "razorpaydata"
-        val `val`: String = razorData
-        view.evaluateJavascript("window.localStorage.setItem('$key','$`val`');", null)
+        try {
+            val key = "razorpaydata"
+            val `val`: String = razorData
+            view.evaluateJavascript("window.localStorage.setItem('$key','$`val`');", null)
+        }catch (ex :Exception){
+            ex.printStackTrace()
+        }
     }
 }

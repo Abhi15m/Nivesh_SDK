@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity(), GoldListener, RefreshTokenListener {
         btnWebView.setOnClickListener {
             try {
                 val jsonObject = JSONObject()
-                jsonObject.put("client_code","1014000002")
+                jsonObject.put("niveshClientcode","1014000002")
                 jsonObject.put("ProductId",10)
                 GoldModule().getProductInvestment(this@MainActivity,jsonObject,PRODUCT_INVESTMENT,this)
 
