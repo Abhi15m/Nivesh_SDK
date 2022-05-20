@@ -63,6 +63,7 @@ internal class WebViewActivity : AppCompatActivity(),
     private val preferenceHelper: IPreferenceHelper by lazy { PreferenceManager(this) }
 
     private var razorData: String = ""
+    private var initiateTransaction:Boolean = false;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,33 +83,41 @@ internal class WebViewActivity : AppCompatActivity(),
                 registerReceiver(downloadReceiver, it)
             }
 
-        bindView()
-        init()
 
+        init()
+        bindView()
 
     }
 
     private fun init() {
-        if (intent.hasExtra("payment_status")) {
-            razorData = intent.getStringExtra("payment_status")!!
-            val statusCode: Int = intent.getIntExtra("status_code", 200)
-            if (statusCode == 200) {
-                presenter.validateUrl("https://sdkweb-sandbox.nivesh.com/BuyGoldConfirm")
-//                presenter.validateUrl("http://sdkweb.s3-website.ap-south-1.amazonaws.com/BuyGoldConfirm")
-            } else {
-                presenter.validateUrl("https://sdkweb-sandbox.nivesh.com/failed")
-//                presenter.validateUrl("http://sdkweb.s3-website.ap-south-1.amazonaws.com/buygold/failed")
+        try {
+            if (intent.hasExtra("initiate_transaction")) {
+                initiateTransaction = intent.getBooleanExtra("initiate_transaction",false)
             }
-        } else {
 
-            if (NetworkUtil.hasInternetConnection(this@WebViewActivity)) {
-                presenter.validateUrl(url)
+            if (intent.hasExtra("payment_status")) {
+                razorData = intent.getStringExtra("payment_status")!!
+                val statusCode: Int = intent.getIntExtra("status_code", 200)
+                if (statusCode == 200) {
+                    presenter.validateUrl("https://sdkweb-sandbox.nivesh.com/BuyGoldConfirm")
+//                presenter.validateUrl("http://sdkweb.s3-website.ap-south-1.amazonaws.com/BuyGoldConfirm")
+                } else {
+                    presenter.validateUrl("https://sdkweb-sandbox.nivesh.com/buygold/failed")
+//                presenter.validateUrl("http://sdkweb.s3-website.ap-south-1.amazonaws.com/buygold/failed")
+                }
             } else {
-                Utils.showToast(
-                    this@WebViewActivity,
-                    this.resources.getString(R.string.please_check_internet_connection)
-                )
+
+                if (NetworkUtil.hasInternetConnection(this@WebViewActivity)) {
+                    presenter.validateUrl(url)
+                } else {
+                    Utils.showToast(
+                        this@WebViewActivity,
+                        this.resources.getString(R.string.please_check_internet_connection)
+                    )
+                }
             }
+        }catch (ex:Exception){
+            ex.printStackTrace()
         }
     }
 
@@ -203,12 +212,10 @@ internal class WebViewActivity : AppCompatActivity(),
             setOnLongClickListener {
                 return@setOnLongClickListener true
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                CookieManager.getInstance().removeAllCookies(null)
-                CookieManager.getInstance().flush();
-            };
 
-            WebStorage.getInstance().deleteAllData()
+            if (initiateTransaction) {
+                WebStorage.getInstance().deleteAllData()
+            }
             isLongClickable = false
             isHapticFeedbackEnabled = false
             setWebContentsDebuggingEnabled(true)

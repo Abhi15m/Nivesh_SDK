@@ -75,6 +75,7 @@ class GoldModule : AppCompatActivity(), TokenListener, RefreshTokenListener {
         if (flag == INITIATE_GOLD_INVESTMENT) {
             try {
                 val intent = Intent(context, WebViewActivity::class.java)
+                intent.putExtra("initiate_transaction",true)
                 context.startActivity(intent)
             } catch (ex: Exception) {
                 ex.printStackTrace()
