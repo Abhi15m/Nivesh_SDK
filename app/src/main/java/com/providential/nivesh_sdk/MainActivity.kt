@@ -1,34 +1,31 @@
 package com.providential.nivesh_sdk
 
-import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.JsonObject
 import com.providential.niveshlibrary.gold_module.GoldModule
 import com.providential.niveshlibrary.gold_module.gold_interface.GoldListener
+import com.providential.niveshlibrary.interfaces.IPreferenceHelper
+import com.providential.niveshlibrary.interfaces.RefreshTokenListener
 import com.providential.niveshlibrary.interfaces.TokenListener
 import com.providential.niveshlibrary.util.Utils
 import org.json.JSONObject
 
-class MainActivity : AppCompatActivity(),GoldListener{
+class MainActivity : AppCompatActivity(), GoldListener, RefreshTokenListener {
 
-    var tokenListener:TokenListener? = null
+    var tokenListener: TokenListener? = null
 
     private lateinit var btnTest: Button
     private lateinit var btnWebView: Button
-    private val BUY_GOALD : Int = 101
-    private val PRODUCT_INVESTMENT : Int = 102
+    private val BUY_GOALD: Int = 101
+    private val PRODUCT_INVESTMENT: Int = 102
     private val customBroadcastReceiver = CustomBroadcastReceiver()
-    var progressDialog:ProgressDialog ?= null
+    var progressDialog: ProgressDialog? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,66 +37,66 @@ class MainActivity : AppCompatActivity(),GoldListener{
         progressDialog = ProgressDialog(this)
 //        setWebView()
         btnTest.setOnClickListener {
-        try {
-            val jsonObject = JSONObject()
-            val jsonObjectData = JSONObject()
-            val jsonObjectPartnerData = JSONObject()
-            val addressClientData = JSONObject()
-            val addressPartnerData = JSONObject()
+            try {
+                val jsonObject = JSONObject()
+                val jsonObjectData = JSONObject()
+                val jsonObjectPartnerData = JSONObject()
+                val addressClientData = JSONObject()
+                val addressPartnerData = JSONObject()
 
-            addressClientData.put("addressLine1","")
-            addressClientData.put("addressLine2","")
-            addressClientData.put("state","")
-            addressClientData.put("city","")
-            addressClientData.put("country","")
-            addressClientData.put("pincode","")
+                addressClientData.put("addressLine1", "")
+                addressClientData.put("addressLine2", "")
+                addressClientData.put("state", "")
+                addressClientData.put("city", "")
+                addressClientData.put("country", "")
+                addressClientData.put("pincode", "")
 
-            addressPartnerData.put("addressLine1","")
-            addressPartnerData.put("addressLine2","")
-            addressPartnerData.put("state","")
-            addressPartnerData.put("city","")
-            addressPartnerData.put("country","")
-            addressPartnerData.put("pincode","")
+                addressPartnerData.put("addressLine1", "")
+                addressPartnerData.put("addressLine2", "")
+                addressPartnerData.put("state", "")
+                addressPartnerData.put("city", "")
+                addressPartnerData.put("country", "")
+                addressPartnerData.put("pincode", "")
 
-            jsonObjectData.put("userid", "XYX")
-            jsonObjectData.put("name", "XYX")
-            jsonObjectData.put("emailId", "client@nivesh.com")
-            jsonObjectData.put("phoneNo", "+918668619073")
-            jsonObjectData.put("pan", "XXXXXXXXXXXXX")
-            jsonObjectData.put("accountNo", "XXXXXXXXXXXXX")
-            jsonObjectData.put("ifscCode", "XXXXXXXXXXXXX")
-            jsonObjectData.put("gender", "XXXXXXXXXXXXX")
-            jsonObjectData.put("dob", "XXXXXXXXXXXXX")
-            jsonObjectData.put("address", addressClientData)
+                jsonObjectData.put("userid", "XYX")
+                jsonObjectData.put("name", "XYX")
+                jsonObjectData.put("emailId", "client@nivesh.com")
+                jsonObjectData.put("phoneNo", "+918668619073")
+                jsonObjectData.put("pan", "XXXXXXXXXXXXX")
+                jsonObjectData.put("accountNo", "XXXXXXXXXXXXX")
+                jsonObjectData.put("ifscCode", "XXXXXXXXXXXXX")
+                jsonObjectData.put("gender", "XXXXXXXXXXXXX")
+                jsonObjectData.put("dob", "XXXXXXXXXXXXX")
+                jsonObjectData.put("address", addressClientData)
 
 
-            jsonObjectPartnerData.put("id", "")
-            jsonObjectPartnerData.put("name", "Akhilesh")
-            jsonObjectPartnerData.put("emailId", "partner@nivesh.com")
-            jsonObjectPartnerData.put("phoneNo", "+918668619073")
-            jsonObjectPartnerData.put("pan", "XXXXXXXXXXXXX")
-            jsonObjectPartnerData.put("arn", "XXXXXXXXXXXXX")
-            jsonObjectPartnerData.put("euin", "XXXXXXXXXXXXX")
-            jsonObjectPartnerData.put("accountNo", "XXXXXXXXXXXXX")
-            jsonObjectPartnerData.put("ifscCode", "XXXXXXXXXXXXX")
-            jsonObjectPartnerData.put("gender", "XXXXXXXXXXXXX")
-            jsonObjectPartnerData.put("dob", "XXXXXXXXXXXXX")
-            jsonObjectPartnerData.put("address", addressPartnerData)
+                jsonObjectPartnerData.put("id", "")
+                jsonObjectPartnerData.put("name", "Akhilesh")
+                jsonObjectPartnerData.put("emailId", "partner@nivesh.com")
+                jsonObjectPartnerData.put("phoneNo", "+918668619073")
+                jsonObjectPartnerData.put("pan", "XXXXXXXXXXXXX")
+                jsonObjectPartnerData.put("arn", "XXXXXXXXXXXXX")
+                jsonObjectPartnerData.put("euin", "XXXXXXXXXXXXX")
+                jsonObjectPartnerData.put("accountNo", "XXXXXXXXXXXXX")
+                jsonObjectPartnerData.put("ifscCode", "XXXXXXXXXXXXX")
+                jsonObjectPartnerData.put("gender", "XXXXXXXXXXXXX")
+                jsonObjectPartnerData.put("dob", "XXXXXXXXXXXXX")
+                jsonObjectPartnerData.put("address", addressPartnerData)
 
 //            jsonObject.put("userRefNo", "100")
-            jsonObject.put("workFlowID", "10")
-            jsonObject.put("niveshClientcode", "1014000002")
-            jsonObject.put("niveshPartnercode", "10")
-            jsonObject.put("isClinetInitaited", false)
-            jsonObject.put("clientData", jsonObjectData)
-            jsonObject.put("partnerData", jsonObjectPartnerData)
+                jsonObject.put("workFlowID", "10")
+                jsonObject.put("niveshClientcode", "1014000002")
+                jsonObject.put("niveshPartnercode", "10")
+                jsonObject.put("isClinetInitaited", false)
+                jsonObject.put("clientData", jsonObjectData)
+                jsonObject.put("partnerData", jsonObjectPartnerData)
 
-           GoldModule().initiateTransaction(this@MainActivity,jsonObject,BUY_GOALD,this)
+                GoldModule().initiateTransaction(this@MainActivity, jsonObject, BUY_GOALD, this)
 
 
-        }catch (e:Exception){
-            e.printStackTrace()
-        }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
 
@@ -109,49 +106,68 @@ class MainActivity : AppCompatActivity(),GoldListener{
                 jsonObject.put("client_code","1014000002")
                 jsonObject.put("ProductId",10)
                 GoldModule().getProductInvestment(this@MainActivity,jsonObject,PRODUCT_INVESTMENT,this)
-            }catch (ex:Exception){
+
+//                NiveshActivity().refreshToken(this, this, 101)
+            } catch (ex: Exception) {
                 ex.printStackTrace()
             }
         }
 
         IntentFilter().apply {
             addAction("com.providential.nivesh.passdata")
-            registerReceiver(customBroadcastReceiver,this)
+            registerReceiver(customBroadcastReceiver, this)
         }
     }
 
-    fun showHideProgress(isShow:Boolean,context: Context){
+    fun showHideProgress(isShow: Boolean, context: Context) {
 //        val progressDialog = ProgressDialog(context)
         progressDialog?.setTitle("Please wait")
         progressDialog?.setMessage("Application is loading, please wait")
         if (isShow) {
             progressDialog?.show()
-        }else{
+        } else {
             progressDialog?.dismiss()
         }
     }
 
     override fun onLoad(context: Context, isLoading: Boolean, flag: Int) {
         try {
-            showHideProgress(isLoading,context)
-        }catch (ex:Exception){
+            showHideProgress(isLoading, context)
+        } catch (ex: Exception) {
             ex.printStackTrace()
         }
     }
 
     override fun onSuccess(context: Context, jsonObject: JsonObject, flag: Int) {
-        Utils.showLog("MainActivity","Product Investment Response: $jsonObject")
-        Toast.makeText(context,jsonObject.toString(),Toast.LENGTH_SHORT).show()
+        Utils.showLog("MainActivity", "Product Investment Response: $jsonObject")
+        Toast.makeText(context, jsonObject.toString(), Toast.LENGTH_SHORT).show()
     }
 
     override fun onFailure(context: Context, message: String, flag: Int) {
-        Utils.showLog("MainActivity","Product Investment Error: $message")
-        Toast.makeText(context,message,Toast.LENGTH_SHORT).show()
+        Utils.showLog("MainActivity", "Product Investment Error: $message")
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(customBroadcastReceiver)
+    }
+
+    override fun onSuccessRefreshToken(
+        context: Context,
+        jsonObject: JsonObject,
+        flag: Int,
+        preferenceHelper: IPreferenceHelper
+    ) {
+        val jsonObjectData: JSONObject = JSONObject(jsonObject.toString())
+        val tokenId: String =
+            jsonObjectData.getJSONObject("data").getJSONObject("AuthenticationResult")
+                .getString("IdToken")
+        Toast.makeText(this,tokenId,Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onErrorRefreshToken(context: Context, message: String, flag: Int) {
+
     }
 }

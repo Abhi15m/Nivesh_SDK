@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.providential.niveshlibrary.R
+import com.providential.niveshlibrary.interfaces.IPreferenceHelper
 import com.providential.niveshlibrary.util.Constants.THEME_COLOR
+import com.providential.niveshlibrary.util.PreferenceManager
 import com.providential.niveshlibrary.web_view.ui.WebViewActivity
 import com.razorpay.Checkout
 import com.razorpay.PaymentData
@@ -16,11 +18,13 @@ import org.json.JSONObject
 class PaymentActivity : AppCompatActivity(), PaymentResultWithDataListener{
 
     private lateinit var mContext: Context
+    var preferenceHelper: IPreferenceHelper ?= null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_payment)
 
+        preferenceHelper = PreferenceManager(this)
         startPayment()
     }
 
@@ -35,7 +39,7 @@ class PaymentActivity : AppCompatActivity(), PaymentResultWithDataListener{
 //            co.setKeyID("rzp_test_bcrt5VZSda3cRi")
             val options = JSONObject()
             options.put("currency", "INR")
-            options.put("name", "")
+            options.put("name", preferenceHelper?.getAppName())
             options.put("description", "")
             options.put("image", "")
 //            options.put("order_id", "order_JRr1ntilgNPGMH")

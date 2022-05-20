@@ -41,7 +41,7 @@ import com.providential.niveshlibrary.web_view.util.PermissionUtils
 import org.json.JSONObject
 
 
-class WebViewActivity : AppCompatActivity(),
+internal class WebViewActivity : AppCompatActivity(),
     WebViewPresenterImpl.View,
     View.OnClickListener,
     DownloadListener,
@@ -51,7 +51,8 @@ class WebViewActivity : AppCompatActivity(),
 
     //    private var url = "https://www.nivesh.com/en"
     private var url = "https://sdkweb-sandbox.nivesh.com"
-//    private var url = "http://sdkweb.s3-website.ap-south-1.amazonaws.com/"
+
+    //    private var url = "http://sdkweb.s3-website.ap-south-1.amazonaws.com/"
     private var filePathCallbackLollipop: ValueCallback<Array<Uri>>? = null
     private var filePathCallbackNormal: ValueCallback<Uri>? = null
     private var downloadManager: DownloadManager? = null
@@ -60,26 +61,21 @@ class WebViewActivity : AppCompatActivity(),
         findViewById<CoordinatorLayout>(R.id.a_web_viewer_coordinatorlayout)
     }
     private val webView by lazy { findViewById<WebView>(R.id.web_view) }
-    private val llInternetLost by lazy { findViewById<LinearLayout>(R.id.llInternetLost) }
-    private val btnReload by lazy { findViewById<Button>(R.id.btnReload) }
     private val preferenceHelper: IPreferenceHelper by lazy { PreferenceManager(this) }
 
     private var razorData: String = ""
-    private lateinit var mGoldListener:GoldListener
-    private lateinit var mContext: Context
-    private var mFlag:Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_web_view)
-       try {
-           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-               window.statusBarColor =
-                   Utils.manipulateColor(Color.parseColor("#$THEME_COLOR"), 0.8f)
-           }
-       }catch (ex:Exception){
-           ex.printStackTrace()
-       }
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                window.statusBarColor =
+                    Utils.manipulateColor(Color.parseColor("#$THEME_COLOR"), 0.8f)
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
         IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
             .apply {
                 addAction(DownloadManager.ACTION_NOTIFICATION_CLICKED)
@@ -88,8 +84,12 @@ class WebViewActivity : AppCompatActivity(),
             }
 
         bindView()
+        init()
 
 
+    }
+
+    private fun init() {
         if (intent.hasExtra("payment_status")) {
             razorData = intent.getStringExtra("payment_status")!!
             val statusCode: Int = intent.getIntExtra("status_code", 200)
@@ -100,32 +100,17 @@ class WebViewActivity : AppCompatActivity(),
                 presenter.validateUrl("https://sdkweb-sandbox.nivesh.com/failed")
 //                presenter.validateUrl("http://sdkweb.s3-website.ap-south-1.amazonaws.com/buygold/failed")
             }
-        }else {
+        } else {
 
             if (NetworkUtil.hasInternetConnection(this@WebViewActivity)) {
-                webView.visibility = View.VISIBLE
-                llInternetLost.visibility = View.GONE
                 presenter.validateUrl(url)
             } else {
-                webView.visibility = View.GONE
-                llInternetLost.visibility = View.VISIBLE
+                Utils.showToast(
+                    this@WebViewActivity,
+                    this.resources.getString(R.string.please_check_internet_connection)
+                )
             }
         }
-
-        btnReload.setOnClickListener {
-            onRefresh()
-        }
-
-//        mGoldListener = (intent.getSerializableExtra("listener") as GoldListener?)!!
-
-        throw RuntimeException("Test Crash") // Force a crash
-
-    }
-
-    fun initializeListener(goldListener: GoldListener,context: Context,flag:Int){
-        this.mGoldListener = goldListener
-        this.mContext = context
-        this.mFlag = flag
     }
 
     override fun onDestroy() {
@@ -216,18 +201,22 @@ class WebViewActivity : AppCompatActivity(),
                 allowFileAccess = true
             }
             clearCache(true)
+            setOnLongClickListener {
+                return@setOnLongClickListener true
+            }
+            isLongClickable = false
+            isHapticFeedbackEnabled = false
             setWebContentsDebuggingEnabled(true)
             webChromeClient = MyWebChromeClient()
             webViewClient = MyWebViewClient()
             addJavascriptInterface(this@WebViewActivity, "AndroidPayment")
             addJavascriptInterface(this@WebViewActivity, "AndroidPayment")
             setDownloadListener(this@WebViewActivity)
+
         }
     }
 
-    //    class JavaScriptHandler internal constructor(
-//        private val activity: Activity,
-//    ) {
+    // Open RazorPay SDK
     @JavascriptInterface
     fun returnResult(obj: String?) {
         runOnUiThread(Runnable {
@@ -237,29 +226,24 @@ class WebViewActivity : AppCompatActivity(),
         })
     }
 
+    // Send RazorPay Data to the server
     @JavascriptInterface
     fun getRazorPayResponse(): String {
         return razorData
     }
 
+    // on press back icon or close page after payment success or failure screen close SDK
     @JavascriptInterface
-    fun closeModule(jsonData:String) {
+    fun closeModule(jsonData: String) {
         runOnUiThread(Runnable {
-//            val jsonData = JSONObject(jsonData)
-          //  GoldModule().returnData(this,jsonData.toString())
-
-//            ResultListener().release(this,jsonData.toString(),0)
             Intent().also { intent ->
                 intent.action = "com.providential.nivesh.passdata"
-                intent.putExtra("goldData",jsonData)
+                intent.putExtra("goldData", jsonData)
                 sendBroadcast(intent)
             }
             finish()
         })
     }
-
-//    }
-
 
     override fun loadUrl(url: String) {
         webView.loadUrl(url)
@@ -383,13 +367,12 @@ class WebViewActivity : AppCompatActivity(),
 
     override fun onRefresh() {
         if (NetworkUtil.hasInternetConnection(this@WebViewActivity)) {
-            webView.visibility = View.VISIBLE
-            llInternetLost.visibility = View.GONE
             webView.reload()
-
         } else {
-            webView.visibility = View.GONE
-            llInternetLost.visibility = View.VISIBLE
+            Utils.showToast(
+                this@WebViewActivity,
+                this.resources.getString(R.string.please_check_internet_connection)
+            )
         }
     }
 
@@ -484,16 +467,17 @@ class WebViewActivity : AppCompatActivity(),
 
         override fun onPageFinished(view: WebView?, url: String?) {
             if (NetworkUtil.hasInternetConnection(view?.context!!)) {
-                webView.visibility = View.VISIBLE
-                llInternetLost.visibility = View.GONE
+
 
                 val view = view ?: return
                 val url = url ?: return
 
                 presenter.onReceivedTitle(view.title ?: "", url)
             } else {
-                webView.visibility = View.GONE
-                llInternetLost.visibility = View.VISIBLE
+                Utils.showToast(
+                    view.context,
+                    view.context.getString(R.string.please_check_internet_connection)
+                )
             }
         }
 
@@ -505,12 +489,11 @@ class WebViewActivity : AppCompatActivity(),
                     localStorage(view)
                     localRazorPayStorage(view)
                 }
-
-                webView.visibility = View.VISIBLE
-                llInternetLost.visibility = View.GONE
             } else {
-                webView.visibility = View.GONE
-                llInternetLost.visibility = View.VISIBLE
+                Utils.showToast(
+                    view.context,
+                    view.context.getString(R.string.please_check_internet_connection)
+                )
             }
         }
 
@@ -526,19 +509,16 @@ class WebViewActivity : AppCompatActivity(),
                 url ?: return false
             }
 
-//            if (NetworkUtil.hasInternetConnection(view.context)){
-//
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                    view.loadUrl(request?.url.toString())
-//                }else{
-//                    view.loadUrl(url)
-//                }
-//                webView.visibility = View.VISIBLE
-//                llInternetLost.visibility = View.GONE
-//            }else {
-//                webView.visibility = View.GONE
-//                llInternetLost.visibility = View.VISIBLE
-//            }
+            if (NetworkUtil.hasInternetConnection(view.context)){
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    view.loadUrl(request?.url.toString())
+                }else{
+                    view.loadUrl(url)
+                }
+            }else {
+                Utils.showToast(view.context,view.context.resources.getString(R.string.please_check_internet_connection))
+            }
 
             return when {
                 url.endsWith(".mp4") -> {
@@ -663,12 +643,12 @@ class WebViewActivity : AppCompatActivity(),
         val clr5 = val3[4]
         val clr6 = val3[5]
         val jsonObject = JSONObject()
-        jsonObject.put("bg_header_color","#$clr1")
-        jsonObject.put("txt_header_color","#$clr2")
-        jsonObject.put("primary_button_color","#$clr3")
-        jsonObject.put("secondary_button_color","#$clr4")
-        jsonObject.put("primary_text_color","#$clr5")
-        jsonObject.put("secondary_text_color","#$clr6")
+        jsonObject.put("bg_header_color", "#$clr1")
+        jsonObject.put("txt_header_color", "#$clr2")
+        jsonObject.put("primary_button_color", "#$clr3")
+        jsonObject.put("secondary_button_color", "#$clr4")
+        jsonObject.put("primary_text_color", "#$clr5")
+        jsonObject.put("secondary_text_color", "#$clr6")
 
         webView.evaluateJavascript("window.localStorage.setItem('$key1','$val1');", null)
         webView.evaluateJavascript("window.localStorage.setItem('$key2','$val2');", null)
@@ -679,6 +659,6 @@ class WebViewActivity : AppCompatActivity(),
     private fun localRazorPayStorage(view: WebView) {
         val key = "razorpaydata"
         val `val`: String = razorData
-        view.evaluateJavascript("window.localStorage.setItem('$key','$`val`');",null)
+        view.evaluateJavascript("window.localStorage.setItem('$key','$`val`');", null)
     }
 }

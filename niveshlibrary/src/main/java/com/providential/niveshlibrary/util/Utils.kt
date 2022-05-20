@@ -11,6 +11,7 @@ import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.text.TextUtils
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.viewbinding.BuildConfig
 import com.providential.niveshlibrary.interfaces.IPreferenceHelper
@@ -151,6 +152,14 @@ class Utils {
                 deviceInfo.device_id_for_UMSId = device_id
             }
             return deviceInfo
+        }
+
+        fun showToast(context: Context,message:String){
+            try{
+                Toast.makeText(context,message,Toast.LENGTH_LONG).show()
+            }catch (ex : Exception){
+                ex.printStackTrace()
+            }
         }
     }
 }

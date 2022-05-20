@@ -4,6 +4,11 @@ import android.content.Context
 import com.google.gson.JsonObject
 
 interface RefreshTokenListener {
-    fun onSuccessRefreshToken(context: Context, jsonObject: JsonObject, flag:Int)
+    fun onSuccessRefreshToken(
+        context: Context,
+        jsonObject: JsonObject,
+        flag: Int,
+        preferenceHelper: IPreferenceHelper
+    )
     fun onErrorRefreshToken(context: Context,message:String,flag:Int)
 }

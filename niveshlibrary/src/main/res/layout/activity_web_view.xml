@@ -20,32 +20,5 @@
                 android:layout_height="match_parent"
                 android:scrollbars="none" />
 
-
-        <LinearLayout
-            android:id="@+id/llInternetLost"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:background="@color/white"
-            android:gravity="center"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Check your Internet connection"
-                android:textSize="15sp"
-                android:textColor="#000"/>
-
-            <Button
-                android:id="@+id/btnReload"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Reload"
-                android:backgroundTint="@color/colorPrimary"
-                android:textColor="@color/white"
-                android:layout_marginTop="5dp"/>
-        </LinearLayout>
-
     </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
