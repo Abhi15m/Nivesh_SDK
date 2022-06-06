@@ -15,7 +15,7 @@ import retrofit2.http.*
 interface ApiInterface {
 
     @POST(Constants.GET_TOKEN)
-    suspend fun getTokenAsync(@Body requestBody: RequestBody): Result<GetTokenResponseModel>
+    suspend fun getTokenAsync(@Body requestBody: RequestBody): Result<JsonObject>
 
 
     @POST(Constants.GET_PRODUCT_INVESTMENT)
