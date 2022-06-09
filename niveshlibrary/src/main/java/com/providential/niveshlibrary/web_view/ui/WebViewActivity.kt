@@ -15,6 +15,7 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.Settings
 import android.view.ContextMenu
 import android.view.View
@@ -29,6 +30,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.providential.niveshlibrary.R
 import com.providential.niveshlibrary.interfaces.IPreferenceHelper
 import com.providential.niveshlibrary.payment.PaymentActivity
+import com.providential.niveshlibrary.util.Constants
 import com.providential.niveshlibrary.util.Constants.COLORS
 import com.providential.niveshlibrary.util.Constants.THEME_COLOR
 import com.providential.niveshlibrary.util.NetworkUtil
@@ -70,8 +72,8 @@ internal class WebViewActivity : AppCompatActivity(),
         setContentView(R.layout.activity_web_view)
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                window.statusBarColor =
-                    Utils.manipulateColor(Color.parseColor("#$THEME_COLOR"), 0.8f)
+                window.statusBarColor = Color.parseColor("#${Constants.STATUS_BAR_COLOR}")
+                //Utils.manipulateColor(Color.parseColor("#$STATUS_BAR_COLOR"), 0.8f)
             }
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -297,7 +299,8 @@ internal class WebViewActivity : AppCompatActivity(),
     }
 
     override fun onDownloadStart(url: String) {
-        onDownloadStart(url, null, null, "image/jpeg", 0)
+        onDownloadStart(url.trim(), null, null, "image/jpeg", 0)
+//        onDownloadStart("https://sdkweb-sandbox.nivesh.com/6b6c6a56-b74c-4a17-89f0-3427c755086b", null, null, "image/jpeg", 0)
     }
 
     override fun setProgressBar(progress: Int) {
@@ -363,18 +366,22 @@ internal class WebViewActivity : AppCompatActivity(),
         mimeType: String,
         contentLength: Long
     ) {
-        if (downloadManager == null) {
-            downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-        }
-        downloadUrl = url
-        downloadMimetype = mimeType
-        val hasPermission = PermissionUtils.hasPermission(
-            this,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            PermissionUtils.REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE
-        )
-        if (hasPermission) {
-            mLastDownloadId = FileUtils.downloadFile(this, url, mimeType)
+        try {
+            if (downloadManager == null) {
+                downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+            }
+            downloadUrl = url
+            downloadMimetype = mimeType
+            val hasPermission = PermissionUtils.hasPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                PermissionUtils.REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE
+            )
+            if (hasPermission) {
+                mLastDownloadId = FileUtils.downloadFile(this, url, mimeType)
+            }
+        }catch (e:Exception){
+            e.printStackTrace()
         }
     }
 
@@ -564,21 +571,25 @@ internal class WebViewActivity : AppCompatActivity(),
 
     private val downloadReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val action = intent.action
-            if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == action) {
-                if (downloadManager != null) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                        val downloadedUri =
-                            downloadManager!!.getUriForDownloadedFile(mLastDownloadId)
-                        val mimeType =
-                            downloadManager!!.getMimeTypeForDownloadedFile(mLastDownloadId)
-                        NotifyDownloadedTask().execute(downloadedUri.toString(), mimeType)
+            try {
+                val action = intent.action
+                if (DownloadManager.ACTION_DOWNLOAD_COMPLETE == action) {
+                    if (downloadManager != null) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                            val downloadedUri =
+                                downloadManager!!.getUriForDownloadedFile(mLastDownloadId)
+                            val mimeType =
+                                downloadManager!!.getMimeTypeForDownloadedFile(mLastDownloadId)
+                            NotifyDownloadedTask().execute(downloadedUri.toString(), mimeType)
+                        }
                     }
+                } else if (DownloadManager.ACTION_NOTIFICATION_CLICKED == action) {
+                    val notiIntent = Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)
+                    notiIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    context.startActivity(notiIntent)
                 }
-            } else if (DownloadManager.ACTION_NOTIFICATION_CLICKED == action) {
-                val notiIntent = Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)
-                notiIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                context.startActivity(notiIntent)
+            }catch (e:Exception){
+                e.printStackTrace()
             }
         }
     }
@@ -606,26 +617,30 @@ internal class WebViewActivity : AppCompatActivity(),
         }
 
         override fun onPostExecute(results: Array<String?>?) {
-            if (results != null && results.size == 3) {
-                val uriStr = results[0]
-                val fileName = results[1]
-                val mimeType = results[2]
-                Snackbar.make(
-                    coordinatorlayout,
-                    fileName + getString(R.string.downloaded_message),
-                    Snackbar.LENGTH_LONG
-                ).apply {
-                    duration = resources.getInteger(R.integer.snackbar_duration)
-                    setAction(getString(R.string.open)) {
-                        Intent(Intent.ACTION_VIEW)
-                            .setDataAndType(Uri.parse(uriStr), mimeType)
-                            .let {
-                                presenter.startActivity(it)
-                            }
+            try {
+                if (results != null && results.size == 3) {
+                    val uriStr = results[0]
+                    val fileName = results[1]
+                    val mimeType = results[2]
+                    Snackbar.make(
+                        coordinatorlayout,
+                        fileName + getString(R.string.downloaded_message),
+                        Snackbar.LENGTH_LONG
+                    ).apply {
+                        duration = resources.getInteger(R.integer.snackbar_duration)
+                        setAction(getString(R.string.open)) {
+                            Intent(Intent.ACTION_VIEW)
+                                .setDataAndType(Uri.parse(uriStr), mimeType)
+                                .let {
+                                    presenter.startActivity(it)
+                                }
+                        }
+                    }.run {
+                        show()
                     }
-                }.run {
-                    show()
                 }
+            }catch (e:Exception){
+                e.printStackTrace()
             }
         }
     }

@@ -14,5 +14,6 @@ object Constants {
 
     const val INITIATE_GOLD_INVESTMENT = 10101
     var THEME_COLOR : String = ""
+    var STATUS_BAR_COLOR : String = ""
     var COLORS : String = ""
 }
